@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observer | 云端博客</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; color: var(--text); background: var(--bg-secondary); }
+        
+        .container { max-width: 800px; margin: 0 auto; padding: 0 1rem; }
+        .hidden { display: none !important; }
+        
+        /* 导航 */
+        .navbar {
+            background: var(--bg);
+            box-shadow: var(--shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand h1 { color: var(--primary); font-size: 1.5rem; }
+        
+        /* 按钮 */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+        .btn-danger { background: var(--danger); color: white; }
+        
+        /* 文章卡片 */
+        .article-card {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .article-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .article-title { font-size: 1.25rem; color: var(--text); margin-bottom: 0.5rem; }
+        .article-content { color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem; }
+        .article-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--secondary); }
+        
+        /* 模态框 */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        /* 表单 */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+        .form-textarea { min-height: 200px; resize: vertical; }
+        
+        /* 提示 */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+        
+        /* 加载 */
+        .loading { text-align: center; padding: 3rem; }
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* 空状态 */
+        .empty-state { text-align: center; padding: 3rem; }
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- 博客页面 -->
+    <div id="blogPage" class="hidden">
+        <nav class="navbar">
+            <div class="container nav-container">
+                <div class="nav-brand">
+                    <h1>Observer</h1>
+                </div>
+                <button onclick="showLogin()" class="btn btn-secondary" id="adminBtn">
+                    🔧 管理
+                </button>
+            </div>
+        </nav>
+        
+        <main class="container" style="padding-top: 2rem;">
+            <div id="articlesList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载文章中...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 登录页面 -->
+    <div id="loginPage" class="hidden">
+        <div class="container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 100%; max-width: 400px;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h1 style="color: var(--primary); margin-bottom: 0.5rem;">Observer</h1>
+                    <p style="color: var(--text-light);">管理员登录</p>
+                </div>
+                
+                <div id="loginAlert" class="alert hidden"></div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">GitHub Token</label>
+                        <input type="password" id="githubToken" class="form-input" 
+                               placeholder="请输入GitHub Token" required>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
+                            需要repo权限，用于保存文章
+                        </p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">GitHub用户名</label>
+                        <input type="text" id="githubUser" class="form-input" 
+                               placeholder="您的GitHub用户名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">仓库名</label>
+                        <input type="text" id="repoName" class="form-input" 
+                               placeholder="observer-blog" value="observer-blog" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        保存配置
+                    </button>
+                    
+                    <div style="margin-top: 2rem; padding: 1rem; background: var(--bg); border-radius: var(--radius);">
+                        <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem;">如何获取Token？</h3>
+                        <ol style="font-size: 0.8rem; color: var(--text-light); padding-left: 1.5rem;">
+                            <li>访问 GitHub → Settings → Developer settings</li>
+                            <li>选择 Personal access tokens → Tokens (classic)</li>
+                            <li>点击 Generate new token</li>
+                            <li>权限勾选：repo (全部)</li>
+                            <li>复制生成的token</li>
+                        </ol>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 管理页面 -->
+    <div id="adminPage" class="hidden">
+        <nav class="navbar">
+            <div class="container nav-container">
+                <div>
+                    <h1>管理后台</h1>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button onclick="loadArticles()" class="btn btn-secondary">刷新</button>
+                    <button onclick="showBlog()" class="btn btn-secondary">返回</button>
+                </div>
+            </div>
+        </nav>
+        
+        <main class="container" style="padding-top: 2rem;">
+            <div id="adminAlert" class="alert hidden"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>文章管理</h2>
+                <button onclick="showNewArticleModal()" class="btn btn-primary">新建文章</button>
+            </div>
+            
+            <div id="adminArticlesList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 文章详情模态框 -->
+    <div id="articleModal" class="modal hidden">
+        <div class="modal-content">
+            <button onclick="hideArticleModal()" style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            <h2 id="modalTitle" style="margin-bottom: 1rem;"></h2>
+            <div id="modalContent" style="line-height: 1.8; margin-bottom: 2rem;"></div>
+            <div id="modalMeta" style="color: var(--text-light); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 1rem;"></div>
+        </div>
+    </div>
+    
+    <!-- 新建/编辑文章模态框 -->
+    <div id="articleFormModal" class="modal hidden">
+        <div class="modal-content">
+            <button onclick="hideArticleFormModal()" style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            <h2 id="formTitle" style="margin-bottom: 1.5rem;">新建文章</h2>
+            
+            <form id="articleForm">
+                <input type="hidden" id="editArticleId">
+                
+                <div class="form-group">
+                    <label class="form-label">标题</label>
+                    <input type="text" id="articleTitle" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">内容</label>
+                    <textarea id="articleContent" class="form-textarea" required></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" onclick="hideArticleFormModal()" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// ============================
+// 配置信息
+// ============================
+let config = {
+    githubToken: localStorage.getItem('observer_github_token'),
+    githubUser: localStorage.getItem('observer_github_user'),
+    repoName: localStorage.getItem('observer_repo_name') || 'observer-blog',
+    isAdmin: false
+};
+
+// 文章数据URL（公开访问）
+function getArticlesUrl() {
+    return `https://raw.githubusercontent.com/${config.githubUser}/${config.repoName}/main/articles.json`;
+}
+
+// 文章API URL（需要Token）
+function getApiUrl() {
+    return `https://api.github.com/repos/${config.githubUser}/${config.repoName}/contents/articles.json`;
+}
+
+// ============================
+// 页面控制
+// ============================
+function showPage(pageId) {
+    ['blogPage', 'loginPage', 'adminPage'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById(pageId).classList.remove('hidden');
+}
+
+function showBlog() {
+    if (!config.githubUser) {
+        showLogin();
+        return;
+    }
+    showPage('blogPage');
+    loadArticles();
+}
+
+function showAdmin() {
+    if (!config.isAdmin) {
+        showLogin();
+        return;
+    }
+    showPage('adminPage');
+    loadAdminArticles();
+}
+
+function showLogin() {
+    showPage('loginPage');
+    if (config.githubToken) {
+        document.getElementById('githubToken').value = config.githubToken;
+    }
+    if (config.githubUser) {
+        document.getElementById('githubUser').value = config.githubUser;
+    }
+    document.getElementById('repoName').value = config.repoName;
+}
+
+// ============================
+// 登录配置
+// ============================
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const token = document.getElementById('githubToken').value.trim();
+    const user = document.getElementById('githubUser').value.trim();
+    const repo = document.getElementById('repoName').value.trim();
+    
+    if (!token || !user || !repo) {
+        showAlert('loginAlert', '请填写所有信息', 'error');
+        return;
+    }
+    
+    // 保存配置
+    config.githubToken = token;
+    config.githubUser = user;
+    config.repoName = repo;
+    config.isAdmin = true;
+    
+    localStorage.setItem('observer_github_token', token);
+    localStorage.setItem('observer_github_user', user);
+    localStorage.setItem('observer_repo_name', repo);
+    
+    // 测试连接
+    try {
+        await testGitHubConnection();
+        showAlert('loginAlert', '配置成功！', 'success');
+        setTimeout(() => showBlog(), 1000);
+    } catch (error) {
+        showAlert('loginAlert', '连接失败：' + error.message, 'error');
+    }
+});
+
+// 测试GitHub连接
+async function testGitHubConnection() {
+    const response = await fetch(getApiUrl(), {
+        headers: {
+            'Authorization': `token ${config.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    });
+    
+    if (!response.ok) {
+        if (response.status === 404) {
+            // 文件不存在，尝试创建
+            await initArticlesFile();
+        } else {
+            throw new Error('GitHub连接失败');
+        }
+    }
+}
+
+// 初始化文章文件
+async function initArticlesFile() {
+    const initialData = {
+        articles: [],
+        lastUpdated: new Date().toISOString()
+    };
+    
+    const response = await fetch(getApiUrl(), {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${config.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: '初始化文章数据',
+            content: btoa(JSON.stringify(initialData, null, 2))
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error('初始化失败');
+    }
+}
+
+// ============================
+// 文章管理
+// ============================
+// 加载文章（公开访问）
+async function loadArticles() {
+    const container = document.getElementById('articlesList');
+    
+    try {
+        const response = await fetch(getArticlesUrl() + '?t=' + Date.now());
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>暂无文章</p>
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
+                            博客尚未发布任何内容
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            throw new Error('加载失败');
+        }
+        
+        const data = await response.json();
+        const articles = data.articles || [];
+        
+        if (articles.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <p>暂无文章</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = articles.map(article => `
+            <div class="article-card" onclick="showArticle('${article.id}')">
+                <h3 class="article-title">${escapeHtml(article.title)}</h3>
+                <div class="article-content">${escapeHtml(truncate(article.content, 150))}</div>
+                <div class="article-meta">
+                    <span>📅 ${formatDate(article.createdAt)}</span>
+                    <span>👁️ 点击阅读</span>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <p>加载失败</p>
+                <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
+                    请检查网络连接
+                </p>
+            </div>
+        `;
+    }
+}
+
+// 加载管理后台文章
+async function loadAdminArticles() {
+    const container = document.getElementById('adminArticlesList');
+    
+    try {
+        const data = await fetchArticlesData();
+        const articles = data.articles || [];
+        
+        if (articles.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <p>暂无文章</p>
+                    <button onclick="showNewArticleModal()" class="btn btn-primary" style="margin-top: 1rem;">
+                        开始写作
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = articles.map(article => `
+            <div class="article-card">
+                <h3 class="article-title">${escapeHtml(article.title)}</h3>
+                <div class="article-content">${escapeHtml(truncate(article.content, 100))}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="font-size: 0.8rem; color: var(--text-light);">
+                        创建：${formatDate(article.createdAt, true)}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="editArticle('${article.id}')" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            编辑
+                        </button>
+                        <button onclick="deleteArticle('${article.id}')" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            删除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <p>加载失败</p>
+                <p style="font-size: 0.9rem;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// 获取文章数据（需要Token）
+async function fetchArticlesData() {
+    const response = await fetch(getApiUrl(), {
+        headers: config.githubToken ? {
+            'Authorization': `token ${config.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+        } : {}
+    });
+    
+    if (!response.ok) {
+        throw new Error('获取数据失败');
+    }
+    
+    const data = await response.json();
+    return JSON.parse(atob(data.content));
+}
+
+// 保存文章数据
+async function saveArticlesData(articlesData) {
+    const response = await fetch(getApiUrl(), {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${config.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: '更新文章',
+            content: btoa(JSON.stringify(articlesData, null, 2)),
+            sha: await getFileSha()
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error('保存失败');
+    }
+}
+
+// 获取文件SHA
+async function getFileSha() {
+    const response = await fetch(getApiUrl(), {
+        headers: {
+            'Authorization': `token ${config.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    });
+    
+    if (response.ok) {
+        const data = await response.json();
+        return data.sha;
+    }
+    return null;
+}
+
+// ============================
+// 文章操作
+// ============================
+// 显示文章详情
+async function showArticle(articleId) {
+    try {
+        const data = await fetchArticlesData();
+        const article = data.articles.find(a => a.id === articleId);
+        
+        if (!article) {
+            alert('文章不存在');
+            return;
+        }
+        
+        document.getElementById('modalTitle').textContent = article.title;
+        document.getElementById('modalContent').innerHTML = formatContent(article.content);
+        document.getElementById('modalMeta').innerHTML = `
+            发布于：${formatDate(article.createdAt)}
+            ${article.updatedAt ? `，更新于：${formatDate(article.updatedAt)}` : ''}
+        `;
+        
+        document.getElementById('articleModal').classList.remove('hidden');
+    } catch (error) {
+        alert('加载失败：' + error.message);
+    }
+}
+
+function hideArticleModal() {
+    document.getElementById('articleModal').classList.add('hidden');
+}
+
+// 新建文章
+function showNewArticleModal() {
+    document.getElementById('formTitle').textContent = '新建文章';
+    document.getElementById('editArticleId').value = '';
+    document.getElementById('articleTitle').value = '';
+    document.getElementById('articleContent').value = '';
+    document.getElementById('articleFormModal').classList.remove('hidden');
+}
+
+// 编辑文章
+async function editArticle(articleId) {
+    try {
+        const data = await fetchArticlesData();
+        const article = data.articles.find(a => a.id === articleId);
+        
+        if (!article) {
+            alert('文章不存在');
+            return;
+        }
+        
+        document.getElementById('formTitle').textContent = '编辑文章';
+        document.getElementById('editArticleId').value = article.id;
+        document.getElementById('articleTitle').value = article.title;
+        document.getElementById('articleContent').value = article.content;
+        document.getElementById('articleFormModal').classList.remove('hidden');
+    } catch (error) {
+        alert('加载失败：' + error.message);
+    }
+}
+
+function hideArticleFormModal() {
+    document.getElementById('articleFormModal').classList.add('hidden');
+}
+
+// 保存文章
+document.getElementById('articleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('editArticleId').value;
+    const title = document.getElementById('articleTitle').value.trim();
+    const content = document.getElementById('articleContent').value.trim();
+    
+    if (!title || !content) {
+        alert('请填写标题和内容');
+        return;
+    }
+    
+    try {
+        const data = await fetchArticlesData();
+        const articles = data.articles || [];
+        
+        if (id) {
+            // 更新文章
+            const index = articles.findIndex(a => a.id === id);
+            if (index !== -1) {
+                articles[index] = {
+                    ...articles[index],
+                    title,
+                    content,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+        } else {
+            // 新建文章
+            articles.unshift({
+                id: generateId(),
+                title,
+                content,
+                createdAt: new Date().toISOString(),
+                updatedAt: null
+            });
+        }
+        
+        data.articles = articles;
+        data.lastUpdated = new Date().toISOString();
+        
+        await saveArticlesData(data);
+        
+        hideArticleFormModal();
+        await loadArticles();
+        await loadAdminArticles();
+        
+        showAlert('adminAlert', id ? '文章更新成功' : '文章发布成功', 'success');
+        
+    } catch (error) {
+        alert('保存失败：' + error.message);
+    }
+});
+
+// 删除文章
+async function deleteArticle(articleId) {
+    if (!confirm('确定要删除这篇文章吗？此操作不可恢复。')) {
+        return;
+    }
+    
+    try {
+        const data = await fetchArticlesData();
+        data.articles = data.articles.filter(a => a.id !== articleId);
+        data.lastUpdated = new Date().toISOString();
+        
+        await saveArticlesData(data);
+        
+        await loadArticles();
+        await loadAdminArticles();
+        
+        showAlert('adminAlert', '文章删除成功', 'success');
+    } catch (error) {
+        alert('删除失败：' + error.message);
+    }
+}
+
+// ============================
+// 工具函数
+// ============================
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function truncate(text, length) {
+    return text.length > length ? text.substring(0, length) + '...' : text;
+}
+
+function formatDate(dateString, withTime = false) {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    
+    if (withTime) {
+        options.hour = '2-digit';
+        options.minute = '2-digit';
+    }
+    
+    return date.toLocaleDateString('zh-CN', options);
+}
+
+function formatContent(text) {
+    return text
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>');
+}
+
+function showAlert(elementId, message, type = 'info') {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.className = `alert alert-${type}`;
+    element.classList.remove('hidden');
+    
+    setTimeout(() => {
+        element.classList.add('hidden');
+    }, 3000);
+}
+
+// ============================
+// 初始化
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+    // 检查是否有配置
+    if (config.githubToken && config.githubUser) {
+        config.isAdmin = true;
+        showBlog();
+    } else {
+        showLogin();
+    }
+    
+    // 绑定事件
+    document.getElementById('adminBtn').addEventListener('click', showAdmin);
+});
+
+// 全局函数
+window.showBlog = showBlog;
+window.showAdmin = showAdmin;
+window.showLogin = showLogin;
+window.showArticle = showArticle;
+window.hideArticleModal = hideArticleModal;
+window.showNewArticleModal = showNewArticleModal;
+window.hideArticleFormModal = hideArticleFormModal;
+window.editArticle = editArticle;
+window.deleteArticle = deleteArticle;
+window.loadArticles = loadArticles;
+</script>
+</body>
+  </html>

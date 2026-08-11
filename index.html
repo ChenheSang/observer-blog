@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Observer | 云端博客</title>
-    <style>
+<style>
         :root {
             --primary: #2563eb;
             --primary-dark: #1e40af;
@@ -129,150 +129,150 @@
         /* 空状态 */
         .empty-state { text-align: center; padding: 3rem; }
         .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-    </style>
-</head>
-<body>
+</style>
+  </head>
+  <body>
     <!-- 博客页面 -->
     <div id="blogPage" class="hidden">
-        <nav class="navbar">
-            <div class="container nav-container">
-                <div class="nav-brand">
-                    <h1>Observer</h1>
-                </div>
-                <button onclick="showLogin()" class="btn btn-secondary" id="adminBtn">
-                    🔧 管理
-                </button>
-            </div>
-        </nav>
-        
-        <main class="container" style="padding-top: 2rem;">
-            <div id="articlesList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>加载文章中...</p>
-                </div>
-            </div>
-        </main>
+	  <nav class="navbar">
+		<div class="container nav-container">
+		  <div class="nav-brand">
+			<h1>Observer</h1>
+		  </div>
+		  <button onclick="showLogin()" class="btn btn-secondary" id="adminBtn">
+			🔧 管理
+		  </button>
+		</div>
+	  </nav>
+
+	  <main class="container" style="padding-top: 2rem;">
+		<div id="articlesList">
+		  <div class="loading">
+			<div class="spinner"></div>
+			<p>加载文章中...</p>
+		  </div>
+		</div>
+	  </main>
     </div>
-    
+
     <!-- 登录页面 -->
     <div id="loginPage" class="hidden">
-        <div class="container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-            <div style="width: 100%; max-width: 400px;">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <h1 style="color: var(--primary); margin-bottom: 0.5rem;">Observer</h1>
-                    <p style="color: var(--text-light);">管理员登录</p>
-                </div>
-                
-                <div id="loginAlert" class="alert hidden"></div>
-                
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label class="form-label">GitHub Token</label>
-                        <input type="password" id="githubToken" class="form-input" 
-                               placeholder="请输入GitHub Token" required>
-                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
-                            需要repo权限，用于保存文章
-                        </p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">GitHub用户名</label>
-                        <input type="text" id="githubUser" class="form-input" 
-                               placeholder="您的GitHub用户名" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">仓库名</label>
-                        <input type="text" id="repoName" class="form-input" 
-                               placeholder="observer-blog" value="observer-blog" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        保存配置
-                    </button>
-                    
-                    <div style="margin-top: 2rem; padding: 1rem; background: var(--bg); border-radius: var(--radius);">
-                        <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem;">如何获取Token？</h3>
-                        <ol style="font-size: 0.8rem; color: var(--text-light); padding-left: 1.5rem;">
-                            <li>访问 GitHub → Settings → Developer settings</li>
-                            <li>选择 Personal access tokens → Tokens (classic)</li>
-                            <li>点击 Generate new token</li>
-                            <li>权限勾选：repo (全部)</li>
-                            <li>复制生成的token</li>
-                        </ol>
-                    </div>
-                </form>
-            </div>
-        </div>
+	  <div class="container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+		<div style="width: 100%; max-width: 400px;">
+		  <div style="text-align: center; margin-bottom: 2rem;">
+			<h1 style="color: var(--primary); margin-bottom: 0.5rem;">Observer</h1>
+			<p style="color: var(--text-light);">管理员登录</p>
+		  </div>
+
+		  <div id="loginAlert" class="alert hidden"></div>
+
+		  <form id="loginForm">
+			<div class="form-group">
+			  <label class="form-label">GitHub Token</label>
+			  <input type="password" id="githubToken" class="form-input" 
+				placeholder="请输入GitHub Token" required>
+			  <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
+				需要repo权限，用于保存文章
+			  </p>
+			</div>
+
+			<div class="form-group">
+			  <label class="form-label">GitHub用户名</label>
+			  <input type="text" id="githubUser" class="form-input" 
+				placeholder="您的GitHub用户名" required>
+			</div>
+
+			<div class="form-group">
+			  <label class="form-label">仓库名</label>
+			  <input type="text" id="repoName" class="form-input" 
+				placeholder="observer-blog" value="observer-blog" required>
+			</div>
+
+			<button type="submit" class="btn btn-primary" style="width: 100%;">
+			  保存配置
+			</button>
+
+			<div style="margin-top: 2rem; padding: 1rem; background: var(--bg); border-radius: var(--radius);">
+			  <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem;">如何获取Token？</h3>
+			  <ol style="font-size: 0.8rem; color: var(--text-light); padding-left: 1.5rem;">
+				<li>访问 GitHub → Settings → Developer settings</li>
+				<li>选择 Personal access tokens → Tokens (classic)</li>
+				<li>点击 Generate new token</li>
+				<li>权限勾选：repo (全部)</li>
+				<li>复制生成的token</li>
+			  </ol>
+			</div>
+		  </form>
+		</div>
+	  </div>
     </div>
-    
+
     <!-- 管理页面 -->
     <div id="adminPage" class="hidden">
-        <nav class="navbar">
-            <div class="container nav-container">
-                <div>
-                    <h1>管理后台</h1>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button onclick="loadArticles()" class="btn btn-secondary">刷新</button>
-                    <button onclick="showBlog()" class="btn btn-secondary">返回</button>
-                </div>
-            </div>
-        </nav>
-        
-        <main class="container" style="padding-top: 2rem;">
-            <div id="adminAlert" class="alert hidden"></div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>文章管理</h2>
-                <button onclick="showNewArticleModal()" class="btn btn-primary">新建文章</button>
-            </div>
-            
-            <div id="adminArticlesList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>加载中...</p>
-                </div>
-            </div>
-        </main>
+	  <nav class="navbar">
+		<div class="container nav-container">
+		  <div>
+			<h1>管理后台</h1>
+		  </div>
+		  <div style="display: flex; gap: 0.5rem;">
+			<button onclick="loadArticles()" class="btn btn-secondary">刷新</button>
+			<button onclick="showBlog()" class="btn btn-secondary">返回</button>
+		  </div>
+		</div>
+	  </nav>
+
+	  <main class="container" style="padding-top: 2rem;">
+		<div id="adminAlert" class="alert hidden"></div>
+
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+		  <h2>文章管理</h2>
+		  <button onclick="showNewArticleModal()" class="btn btn-primary">新建文章</button>
+		</div>
+
+		<div id="adminArticlesList">
+		  <div class="loading">
+			<div class="spinner"></div>
+			<p>加载中...</p>
+		  </div>
+		</div>
+	  </main>
     </div>
-    
+
     <!-- 文章详情模态框 -->
     <div id="articleModal" class="modal hidden">
-        <div class="modal-content">
-            <button onclick="hideArticleModal()" style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
-            <h2 id="modalTitle" style="margin-bottom: 1rem;"></h2>
-            <div id="modalContent" style="line-height: 1.8; margin-bottom: 2rem;"></div>
-            <div id="modalMeta" style="color: var(--text-light); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 1rem;"></div>
-        </div>
+	  <div class="modal-content">
+		<button onclick="hideArticleModal()" style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+		<h2 id="modalTitle" style="margin-bottom: 1rem;"></h2>
+		<div id="modalContent" style="line-height: 1.8; margin-bottom: 2rem;"></div>
+		<div id="modalMeta" style="color: var(--text-light); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 1rem;"></div>
+	  </div>
     </div>
-    
+
     <!-- 新建/编辑文章模态框 -->
     <div id="articleFormModal" class="modal hidden">
-        <div class="modal-content">
-            <button onclick="hideArticleFormModal()" style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
-            <h2 id="formTitle" style="margin-bottom: 1.5rem;">新建文章</h2>
-            
-            <form id="articleForm">
-                <input type="hidden" id="editArticleId">
-                
-                <div class="form-group">
-                    <label class="form-label">标题</label>
-                    <input type="text" id="articleTitle" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">内容</label>
-                    <textarea id="articleContent" class="form-textarea" required></textarea>
-                </div>
-                
-                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem;">
-                    <button type="button" onclick="hideArticleFormModal()" class="btn btn-secondary">取消</button>
-                    <button type="submit" class="btn btn-primary">保存</button>
-                </div>
-            </form>
-        </div>
+	  <div class="modal-content">
+		<button onclick="hideArticleFormModal()" style="float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+		<h2 id="formTitle" style="margin-bottom: 1.5rem;">新建文章</h2>
+
+		<form id="articleForm">
+		  <input type="hidden" id="editArticleId">
+
+		  <div class="form-group">
+			<label class="form-label">标题</label>
+			<input type="text" id="articleTitle" class="form-input" required>
+		  </div>
+
+		  <div class="form-group">
+			<label class="form-label">内容</label>
+			<textarea id="articleContent" class="form-textarea" required></textarea>
+		  </div>
+
+		  <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem;">
+			<button type="button" onclick="hideArticleFormModal()" class="btn btn-secondary">取消</button>
+			<button type="submit" class="btn btn-primary">保存</button>
+		  </div>
+		</form>
+	  </div>
     </div>
 
 <script>
@@ -405,7 +405,7 @@ async function initArticlesFile() {
         },
         body: JSON.stringify({
             message: '初始化文章数据',
-            content: btoa(JSON.stringify(initialData, null, 2))
+			content: btoa(unescape(encodeURIComponent(JSON.stringify(initialData, null, 2))))
         })
     });
     
@@ -543,7 +543,7 @@ async function fetchArticlesData() {
     }
     
     const data = await response.json();
-    return JSON.parse(atob(data.content));
+	return JSON.parse(decodeURIComponent(escape(atob(data.content))));
 }
 
 // 保存文章数据
@@ -802,5 +802,5 @@ window.editArticle = editArticle;
 window.deleteArticle = deleteArticle;
 window.loadArticles = loadArticles;
 </script>
-</body>
-  </html>
+  </body>
+</html>

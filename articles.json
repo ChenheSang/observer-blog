@@ -1,4 +1,12 @@
 {
-  "articles": [],
-  "lastUpdated": "2024-01-01T00:00:00.000Z"
+  "articles": [
+    {
+      "id": "msoy8riwxmddshl66q",
+      "title": "A Memorable Rainy Night",
+      "content": "Last New Year's Eve, I broke the code.\n\nThis summer, it sprouts again in the cache.\n\nI thought I was a lost pointer,\n\ndrifting at the bottom of a C stack,\n\ntossing in assembly registers, unable to sleep.\n\nThen I opened last year's search history\n\nand found that unfinished blog.\n\nLike a letter never sent,\n\nit waited in the stack of time.\n\nTurns out passion was never a detour.\n\nIt was the way home.\n\nSixteen, the pointer hung\n\nbetween school and what I love.\n\nTonight it lands.\n\nYou say HTML is your land,\n\nbut I see those lit screens at night\n\nalready answered the choices for you.\n\nThose nights talking to machines,\n\nthose evenings debugging the same lines,\n\nwere not stolen time.\n\nThey were practice.\n\nPractice for saying yourself clearly in this world.\n\nNo need to ask how passion meets the future.\n\nWhen you wrote your first line of poetry,\n\nthe future moved aside.\n\nTonight the clock hands meet.\n\nPast and future blur.\n\nThat blog that missed last New Year's Eve\n\nis now, on an ordinary summer morning,\n\nyour gift to yourself.\n\nGo study for the exam, Observer.\n\nC and assembly stay.\n\nYour blog stays.\n\nThey wait in some corner of GitHub,\n\nlike a promise that does not expire.\n\nNext year, you come back better,\n\nto finish the code you started\n\nand read the books you put down.\n\nBy then, you'll know:\n\nEvery wrong turn was a shortcut to yourself.",
+      "createdAt": "2026-08-11T17:43:39.608Z",
+      "updatedAt": null
+    }
+  ],
+  "lastUpdated": "2026-08-11T17:43:39.608Z"
 }

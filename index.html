@@ -306,18 +306,22 @@ function showPage(pageId) {
 }
 
 function showBlog() {
-    if (!config.githubUser) {
-        showLogin();
-        return;
-    }
-    showPage('blogPage');
-    loadArticles();
+  showPage("blogPage");
+  loadArticles();
 }
 
-function showAdmin() {
-    if (!config.isAdmin) {
-        showLogin();
-        return;
+
+
+
+
+
+
+
+
+
+
+
+
     }
     showPage('adminPage');
     loadAdminArticles();

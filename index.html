@@ -286,11 +286,10 @@ let config = {
     isAdmin: false
 };
 
-// 文章数据URL（公开访问）
+//文章数据 URL 公开访问
 function getArticlesUrl() {
-    return `https://raw.githubusercontent.com/${config.githubUser}/${config.repoName}/main/articles.json`;
+  return 'articles.json?t=' + Date.now();
 }
-
 // 文章API URL（需要Token）
 function getApiUrl() {
     return `https://api.github.com/repos/${config.githubUser}/${config.repoName}/contents/articles.json`;
@@ -428,7 +427,7 @@ async function loadArticles() {
     if (!response.ok) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📭</div>
+          <div class="empty-icon">🐝</div>
           <p>加载失败</p>
         </div>
       `;
@@ -436,14 +435,12 @@ async function loadArticles() {
     }
 
     const data = await response.json();
-    const text = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
-    const json = JSON.parse(text);
-    const articles = json.articles || [];
+    const articles = Array.isArray(data) ? data : (data.articles || []);
 
     if (articles.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📭</div>
+          <div class="empty-icon">🐝</div>
           <p>暂无文章</p>
           <button onclick="showWriteArticleModal()" class="btn btn-primary">开始写作</button>
         </div>
@@ -458,7 +455,7 @@ async function loadArticles() {
         <div style="display:flex; gap:0.5rem; margin-top:0.75rem; align-items:center; justify-content:space-between;">
           <span style="font-size:0.8rem; color:var(--text-light);">创建于 ${formatDate(article.createdAt)}</span>
           <div style="display:flex; gap:0.5rem;">
-            <button onclick="showArticle('${article.id}')" class="btn btn-sm btn-secondary">阅读</button>
+            <button onclick="showArticle('${article.id}')" class="btn btn-sm btn-secondary">查看</button>
           </div>
         </div>
       </div>
@@ -468,11 +465,12 @@ async function loadArticles() {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">⚠️</div>
-        <p style="font-size:0.9rem; color:var(--text-light); margin-top:0.5rem;">${error.message || '加载失败'}</p>
+        <p style="font-size:0.9rem; color:var(--text-light); margin-top:0.5rem;">${error}</p>
       </div>
     `;
   }
 }
+
 
 
 // 加载管理后台文章

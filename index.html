@@ -423,54 +423,25 @@ async function loadArticles() {
 
   try {
     const response = await fetch(getArticlesUrl());
-
-    if (!response.ok) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🐝</div>
-          <p>加载失败</p>
-        </div>
-      `;
-      return;
-    }
-
+    if (!response.ok) throw new Error('HTTP ' + response.status);
     const data = await response.json();
     const articles = Array.isArray(data) ? data : (data.articles || []);
 
     if (articles.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🐝</div>
-          <p>暂无文章</p>
-          <button onclick="showWriteArticleModal()" class="btn btn-primary">开始写作</button>
-        </div>
-      `;
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🐝</div><p>暂无文章</p></div>';
       return;
     }
 
-    container.innerHTML = articles.map(article => `
-      <div class="article-card animate-article">
-        <h3 class="article-title">${escapeHtml(article.title || '')}</h3>
-        <div class="article-content">${escapeHtml(article.content || '').replace(/\n/g, '<br>')}</div>
-        <div style="display:flex; gap:0.5rem; margin-top:0.75rem; align-items:center; justify-content:space-between;">
-          <span style="font-size:0.8rem; color:var(--text-light);">创建于 ${formatDate(article.createdAt)}</span>
-          <div style="display:flex; gap:0.5rem;">
-            <button onclick="showArticle('${article.id}')" class="btn btn-sm btn-secondary">查看</button>
-          </div>
-        </div>
+    container.innerHTML = articles.map(a => `
+      <div class="article-card">
+        <h3>${a.title || ''}</h3>
+        <p>${(a.content || '').replace(/\n/g, '<br>')}</p>
       </div>
     `).join('');
-
   } catch (error) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <p style="font-size:0.9rem; color:var(--text-light); margin-top:0.5rem;">${error}</p>
-      </div>
-    `;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败：' + (error.message || error) + '</p></div>';
   }
 }
-
 
 
 // 加载管理后台文章

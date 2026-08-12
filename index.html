@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function() {
         config.isAdmin = true;
         showBlog();
     } else {
-        showLogin();
+    document.getElementById('adminBtn').addEventListener('click', showAdmin);
     }
     
     // 绑定事件

@@ -1,4 +1,3 @@
-window.onerror=function(e,a,l,c,err){alert('JS error: '+(err&&err.message||e));console.error(err||e);};
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
@@ -307,22 +306,22 @@ function showPage(pageId) {
 }
 
 function showBlog() {
-  showPage("blogPage");
+  showPage('blogPage');
   loadArticles();
 }
 
+//function showBlog() {
+//    if (!config.githubUser) {
+//        showLogin();
+ //       return;
+   // }
+  //  showPage('blogPage');
+   // loadArticles();
 
-
-
-
-
-
-
-
-
-
-
-
+function showAdmin() {
+    if (!config.isAdmin) {
+        showLogin();
+        return;
     }
     showPage('adminPage');
     loadAdminArticles();
@@ -368,7 +367,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     try {
         await testGitHubConnection();
         showAlert('loginAlert', '配置成功！', 'success');
-        showBlog();
+		showBlog();
+        //setTimeout(() => showBlog(), 1000);
     } catch (error) {
         showAlert('loginAlert', '连接失败：' + error.message, 'error');
     }
@@ -444,8 +444,12 @@ async function loadArticles() {
       </div>
     `).join('');
   } catch (error) {
+    alert("loadArticles error: " + (error.message || error));
     container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败：' + (error.message || error) + '</p></div>';
   }
+ // } catch (error) {
+  //  container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败：' + (error.message || error) + '</p></div>';
+ // }
 }
 
 
@@ -750,14 +754,24 @@ function showAlert(elementId, message, type = 'info') {
 // 初始化
 // ============================
 document.addEventListener('DOMContentLoaded', function() {
-  loadArticles();
-    // 检查是否有配置
+    showBlog();
+
     if (config.githubToken && config.githubUser) {
         config.isAdmin = true;
-        showBlog();
-    } else {
-    document.getElementById('adminBtn').addEventListener('click', showAdmin);
     }
+
+    document.getElementById('adminBtn').addEventListener('click', showAdmin);
+});
+
+
+//document.addEventListener('DOMContentLoaded', function() {
+    // 检查是否有配置
+    //if (config.githubToken && config.githubUser) {
+      //  config.isAdmin = true;
+      //  showBlog();
+   // } else {
+       // showLogin();
+    //}
     
     // 绑定事件
     document.getElementById('adminBtn').addEventListener('click', showAdmin);

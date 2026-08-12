@@ -1,4 +1,12 @@
 {
-  "articles": [],
-  "lastUpdated": "2026-08-12T02:36:02.370Z"
+  "articles": [
+    {
+      "id": "mspiv1bmfpws7wsjow",
+      "title": "test",
+      "content": "test",
+      "createdAt": "2026-08-12T03:20:51.058Z",
+      "updatedAt": null
+    }
+  ],
+  "lastUpdated": "2026-08-12T03:20:51.072Z"
 }

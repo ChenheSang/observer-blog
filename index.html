@@ -745,6 +745,7 @@ function showAlert(elementId, message, type = 'info') {
 // 初始化
 // ============================
 document.addEventListener('DOMContentLoaded', function() {
+  loadArticles();
     // 检查是否有配置
     if (config.githubToken && config.githubUser) {
         config.isAdmin = true;
@@ -768,7 +769,6 @@ window.hideArticleFormModal = hideArticleFormModal;
 window.editArticle = editArticle;
 window.deleteArticle = deleteArticle;
 window.loadArticles = loadArticles;
-loadArticles();
 </script>
   </body>
 </html>

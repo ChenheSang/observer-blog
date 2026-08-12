@@ -419,63 +419,61 @@ async function initArticlesFile() {
 // ============================
 // 加载文章（公开访问）
 async function loadArticles() {
-    const container = document.getElementById('articlesList');
-    
-    try {
-        const response = await fetch(getArticlesUrl() + '?t=' + Date.now());
-        
-        if (!response.ok) {
-            if (response.status === 404) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📝</div>
-                        <p>暂无文章</p>
-                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
-                            博客尚未发布任何内容
-                        </p>
-                    </div>
-                `;
-                return;
-            }
-            throw new Error('加载失败');
-        }
-        
-        const data = await response.json();
-        const articles = data.articles || [];
-        
-        if (articles.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📝</div>
-                    <p>暂无文章</p>
-                </div>
-            `;
-            return;
-        }
-        
-        container.innerHTML = articles.map(article => `
-            <div class="article-card" onclick="showArticle('${article.id}')">
-                <h3 class="article-title">${escapeHtml(article.title)}</h3>
-                <div class="article-content">${escapeHtml(truncate(article.content, 150))}</div>
-                <div class="article-meta">
-                    <span>📅 ${formatDate(article.createdAt)}</span>
-                    <span>👁️ 点击阅读</span>
-                </div>
-            </div>
-        `).join('');
-        
-    } catch (error) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">⚠️</div>
-                <p>加载失败</p>
-                <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
-                    请检查网络连接
-                </p>
-            </div>
-        `;
+  const container = document.getElementById('articleList');
+  if (!container) return;
+
+  try {
+    const response = await fetch(getArticlesUrl());
+
+    if (!response.ok) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>加载失败</p>
+        </div>
+      `;
+      return;
     }
+
+    const data = await response.json();
+    const text = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+    const json = JSON.parse(text);
+    const articles = json.articles || [];
+
+    if (articles.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>暂无文章</p>
+          <button onclick="showWriteArticleModal()" class="btn btn-primary">开始写作</button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = articles.map(article => `
+      <div class="article-card animate-article">
+        <h3 class="article-title">${escapeHtml(article.title || '')}</h3>
+        <div class="article-content">${escapeHtml(article.content || '').replace(/\n/g, '<br>')}</div>
+        <div style="display:flex; gap:0.5rem; margin-top:0.75rem; align-items:center; justify-content:space-between;">
+          <span style="font-size:0.8rem; color:var(--text-light);">创建于 ${formatDate(article.createdAt)}</span>
+          <div style="display:flex; gap:0.5rem;">
+            <button onclick="showArticle('${article.id}')" class="btn btn-sm btn-secondary">阅读</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (error) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <p style="font-size:0.9rem; color:var(--text-light); margin-top:0.5rem;">${error.message || '加载失败'}</p>
+      </div>
+    `;
+  }
 }
+
 
 // 加载管理后台文章
 async function loadAdminArticles() {

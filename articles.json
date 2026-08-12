@@ -1,10 +1,10 @@
 {
   "articles": [
     {
-      "id": "mspivbq8fmz6edb68bl",
+      "id": "mspivcj2v42xttll9dp",
       "title": "test",
       "content": "test",
-      "createdAt": "2026-08-12T03:21:04.544Z",
+      "createdAt": "2026-08-12T03:21:05.582Z",
       "updatedAt": null
     },
     {
@@ -15,5 +15,5 @@
       "updatedAt": null
     }
   ],
-  "lastUpdated": "2026-08-12T03:21:04.544Z"
+  "lastUpdated": "2026-08-12T03:21:05.582Z"
 }

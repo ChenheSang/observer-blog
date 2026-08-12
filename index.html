@@ -1,3 +1,4 @@
+window.onerror=function(e,a,l,c,err){alert('JS error: '+(err&&err.message||e));console.error(err||e);};
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
@@ -367,7 +368,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     try {
         await testGitHubConnection();
         showAlert('loginAlert', '配置成功！', 'success');
-        setTimeout(() => showBlog(), 1000);
+        showBlog();
     } catch (error) {
         showAlert('loginAlert', '连接失败：' + error.message, 'error');
     }

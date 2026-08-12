@@ -4,79 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Observer | 云端博客</title>
-<style>
-:root {
-  --primary: #2563eb;
-  --bg: #ffffff;
-  --bg-secondary: #f8fafc;
-  --text: #1e293b;
-  --text-light: #64748b;
-  --border: #e2e8f0;
-  --radius: 8px;
-  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, sans-serif; line-height: 1.6; color: var(--text); background: var(--bg-secondary); }
-.container { max-width: 800px; margin: 0 auto; padding: 0 1rem; }
-.navbar { background: var(--bg); box-shadow: var(--shadow); padding: 1rem 0; position: sticky; top: 0; z-index: 1000; }
-.nav-container { display: flex; justify-content: space-between; align-items: center; }
-.nav-brand h1 { color: var(--primary); font-size: 1.5rem; }
-.btn { padding: 0.5rem 1rem; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 500; }
-.btn-primary { background: var(--primary); color: white; }
-.btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-.article-card { background: var(--bg); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
-.article-title { font-size: 1.25rem; color: var(--text); margin-bottom: 0.5rem; }
-.article-content { color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem; white-space: pre-wrap; }
-.article-meta { font-size: 0.8rem; color: var(--text-light); }
-.loading { text-align: center; padding: 3rem; }
-.spinner { width: 2rem; height: 2rem; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.empty-state { text-align: center; padding: 3rem; }
-.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-</style>
 </head>
-<body>
-<nav class="navbar">
-  <div class="container nav-container">
-    <div class="nav-brand"><h1>Observer</h1></div>
-    <button onclick="location.href='#'" class="btn btn-secondary">管理</button>
-  </div>
-</nav>
-<main class="container" id="app">
-  <div class="loading">
-    <div class="spinner"></div>
-    <p>加载文章中...</p>
-  </div>
-</main>
+<body style="background:#fff;color:#111;font-family:sans-serif;padding:2rem">
+<h1>Observer</h1>
+<div id="app">加载中...</div>
 <script>
-window.onerror = function(e,a,l,c,err) {
-  alert('JS error: ' + (err && err.message || e) + '\n@' + a + ':' + l);
-  console.error(err||e);
-};
-
-async function loadArticles() {
-  try {
-    const res = await fetch('articles.json?v=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const articles = data.articles || [];
-    const app = document.getElementById('app');
-    if (!articles.length) {
-      app.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>暂无文章</p></div>';
-      return;
-    }
-    app.innerHTML = articles.map(a => {
-      const title = String(a.title || '');
-      const content = String(a.content || '');
-      const date = a.createdAt ? new Date(a.createdAt).toLocaleString() : '';
-      return '<div class="article-card"><h2 class="article-title">' + title + '</h2><div class="article-content">' + content + '</div><div class="article-meta">' + date + '</div></div>';
-    }).join('');
-  } catch(err) {
-    alert('loadArticles error: ' + err.message);
-    document.getElementById('app').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败：' + err.message + '</p></div>';
-  }
-}
-loadArticles();
+document.getElementById('app').textContent = 'JS 执行成功！';
+fetch('articles.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(d => {
+    const list = (d.articles || []);
+    document.getElementById('app').innerHTML =
+      '<p>共 ' + list.length + ' 篇文章</p>' +
+      list.map(a => '<h2>' + a.title + '</h2><p>' + a.content + '</p>').join('');
+  })
+  .catch(err => {
+    document.getElementById('app').innerHTML = '加载失败：' + err.message;
+  });
 </script>
 </body>
 </html>
